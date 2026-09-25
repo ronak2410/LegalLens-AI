@@ -60,6 +60,10 @@ def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
 
     ext = filename.lower().split('.')[-1] if '.' in filename else 'txt'
 
+    ALLOWED_EXTENSIONS = {'txt', 'docx', 'pdf'}
+    if ext not in ALLOWED_EXTENSIONS:
+        raise ValueError(f"Unsupported file format: '{ext}'. Please upload a PDF, DOCX, or TXT file.")
+
     if ext == 'txt':
         try:
             return file_bytes.decode('utf-8')
@@ -106,8 +110,4 @@ def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
         except Exception:
             return ""
 
-    else:
-        try:
-            return file_bytes.decode('utf-8', errors='ignore')
-        except Exception:
-            return ""
+    return ""

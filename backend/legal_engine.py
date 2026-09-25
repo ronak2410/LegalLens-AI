@@ -7,9 +7,15 @@ for ANY arbitrary legal agreement (leases, contractor MSAs, NDAs, SaaS terms, ve
 
 import re
 import html
+import json
+import hashlib
 from typing import List, Dict, Any, Optional, Tuple
 from backend.redline_engine import get_applicable_redlines
 from backend.gemini_engine import summarize_contract_with_gemini
+
+# In-Memory Analysis Hash Cache for sub-millisecond repeated evaluations
+_ANALYSIS_CACHE: Dict[str, Dict[str, Any]] = {}
+
 
 # Core Risk Patterns & Categories
 STANDARD_RULES = [
@@ -203,6 +209,12 @@ def analyze_document_text(text: str, filename: str = "Document.txt", playbook_ru
     Main analysis pipeline.
     Combines rule-based legal heuristic evaluation with optional Google Gemini enhancement.
     """
+    # 1. Check in-memory hash cache
+    pb_str = json.dumps(playbook_rules, sort_keys=True) if playbook_rules else ""
+    cache_key = hashlib.sha256(f"{text[:15000]}|{filename}|{pb_str}|{bool(api_key)}".encode('utf-8')).hexdigest()
+    if not api_key and cache_key in _ANALYSIS_CACHE:
+        return dict(_ANALYSIS_CACHE[cache_key])
+
     # Check if Gemini key is present for real generative AI capabilities
     if api_key:
         gemini_result = summarize_contract_with_gemini(text, api_key)
@@ -311,7 +323,7 @@ def analyze_document_text(text: str, filename: str = "Document.txt", playbook_ru
     # Annotated HTML Viewer
     annotated_html = generate_annotated_html(text, risks_and_flags)
 
-    return {
+    result = {
         "metadata": metadata,
         "risk_assessment": {
             "score": final_score,
@@ -326,6 +338,14 @@ def analyze_document_text(text: str, filename: str = "Document.txt", playbook_ru
         "clauses": clauses[:25],
         "annotated_html": annotated_html
     }
+
+    # Store in cache (cap at 500 entries)
+    if not api_key:
+        if len(_ANALYSIS_CACHE) > 500:
+            _ANALYSIS_CACHE.clear()
+        _ANALYSIS_CACHE[cache_key] = result
+
+    return result
 
 
 def generate_annotated_html(text: str, flags: List[Dict[str, Any]]) -> str:

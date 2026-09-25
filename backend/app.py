@@ -43,6 +43,15 @@ app = FastAPI(
 
 api_router = APIRouter()
 
+import time
+from collections import defaultdict
+from starlette.middleware.gzip import GZipMiddleware
+
+# Rate limiting settings (In-memory sliding window)
+RATE_LIMIT_WINDOW_SEC = 60.0
+RATE_LIMIT_MAX_REQUESTS = 120
+_IP_REQUEST_HISTORY: Dict[str, List[float]] = defaultdict(list)
+
 # ----------------- Security Middlewares -----------------
 
 @app.middleware("http")
@@ -55,10 +64,28 @@ async def enforce_payload_size_and_security_headers(request: Request, call_next)
             content={"detail": "Request payload exceeds maximum allowable limit of 15MB."}
         )
 
-    # 2. Process request
+    # 2. Rate limit API endpoints
+    if request.url.path.startswith("/api") or request.url.path in ["/analyze", "/chat", "/compare", "/upload-batch"]:
+        client_ip = request.client.host if request.client else "127.0.0.1"
+        now = time.time()
+        history = _IP_REQUEST_HISTORY[client_ip]
+        _IP_REQUEST_HISTORY[client_ip] = [t for t in history if (now - t) < RATE_LIMIT_WINDOW_SEC]
+        if len(_IP_REQUEST_HISTORY[client_ip]) >= RATE_LIMIT_MAX_REQUESTS:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Rate limit exceeded. Maximum 120 requests per minute allowable."}
+            )
+        _IP_REQUEST_HISTORY[client_ip].append(now)
+
+    # 3. Process request
     response = await call_next(request)
 
-    # 3. Attach strict security headers
+    # 4. Attach strict security headers and rate limit transparency headers
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    remaining = max(0, RATE_LIMIT_MAX_REQUESTS - len(_IP_REQUEST_HISTORY.get(client_ip, [])))
+    response.headers["X-RateLimit-Limit"] = str(RATE_LIMIT_MAX_REQUESTS)
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
+
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
@@ -73,6 +100,9 @@ async def enforce_payload_size_and_security_headers(request: Request, call_next)
     )
     return response
 
+# High-efficiency GZip compression middleware
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 # Standard CORS policy without insecure wildcard credentials
 app.add_middleware(
     CORSMiddleware,
@@ -81,6 +111,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
 
 
 # ----------------- Request Models -----------------

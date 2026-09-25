@@ -39,3 +39,18 @@ def test_export_docx_endpoint():
     })
     assert res.status_code == 200
     assert len(res.content) > 0
+
+def test_suggested_questions_endpoint():
+    res = client.get("/api/suggested-questions")
+    assert res.status_code == 200
+    data = res.json()
+    assert "categories" in data
+    assert len(data["categories"]) > 0
+
+def test_sample_detail_endpoint():
+    res = client.get("/api/samples/nda_mutual")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["id"] == "nda_mutual"
+    assert "text" in data
+    assert len(data["text"]) > 100

@@ -80,6 +80,13 @@
               <span>Privacy & Safety</span>
             </button>
           </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-glossary" aria-selected="false" class="nav-item" onclick="openModal('glossaryModal')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>Legal Glossary</span>
+              <span class="nav-badge badge-cyan">New</span>
+            </button>
+          </li>
         </ul>
       </nav>
 
@@ -618,6 +625,55 @@
       </div>
       <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
         <button class="btn btn-secondary btn-sm" onclick="closeModal('citationModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legal Terms Glossary Modal -->
+  <div class="modal-overlay" id="glossaryModal" role="dialog" aria-modal="true" aria-labelledby="glossaryModalTitle">
+    <div class="modal-window" style="max-width: 680px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;" aria-hidden="true">📖</span>
+          <h3 class="modal-title" id="glossaryModalTitle">Plain-Language Legal Terms Glossary</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('glossaryModal')" aria-label="Close modal">&times;</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Demystifying dense contractual terms so non-lawyers can evaluate risks with confidence.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 14px; margin-bottom: 4px;">Indemnification (Hold Harmless)</div>
+          <p style="font-size: 13px; color: #CBD5E1; margin: 0; line-height: 1.5;">An agreement where you promise to pay the other party's legal defense costs and court damages if someone sues them because of your work. <em>Watch out for uncapped or one-sided indemnities.</em></p>
+        </div>
+        
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 14px; margin-bottom: 4px;">Liquidated Damages</div>
+          <p style="font-size: 13px; color: #CBD5E1; margin: 0; line-height: 1.5;">A pre-agreed fixed dollar penalty you must pay if you break the contract early, regardless of whether the other party suffered real financial losses.</p>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 14px; margin-bottom: 4px;">Severability Clause</div>
+          <p style="font-size: 13px; color: #CBD5E1; margin: 0; line-height: 1.5;">Ensures that if a court rules one specific clause illegal or unenforceable, the rest of the contract remains active and binding.</p>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 14px; margin-bottom: 4px;">Governing Law & Forum Selection</div>
+          <p style="font-size: 13px; color: #CBD5E1; margin: 0; line-height: 1.5;">Decides which state's laws control the contract and which city/court you must travel to if a lawsuit occurs.</p>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 14px; margin-bottom: 4px;">Force Majeure</div>
+          <p style="font-size: 13px; color: #CBD5E1; margin: 0; line-height: 1.5;">Excuses parties from performance obligations during unforeseeable catastrophic events (natural disasters, pandemics, government wars).</p>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 8px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); font-size: 14px; margin-bottom: 4px;">Work Made for Hire</div>
+          <p style="font-size: 13px; color: #CBD5E1; margin: 0; line-height: 1.5;">A copyright doctrine meaning the client automatically owns everything you create from day one, including preliminary sketches or code.</p>
+        </div>
+      </div>
+      <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary btn-sm" onclick="closeModal('glossaryModal')">Got It</button>
       </div>
     </div>
   </div>
