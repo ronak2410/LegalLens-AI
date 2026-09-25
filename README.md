@@ -1,23 +1,39 @@
 # LegalLens AI ⚖️
 **Enterprise-Grade AI Legal Assistant & Contract Intelligence Platform**
 
-[![CI Test Suite](https://img.shields.io/badge/CI%2FCD-31%20Tests%20Passing-brightgreen.svg)](#-automated-test-suite)
+[![CI Test Suite](https://img.shields.io/badge/CI%2FCD-43%20Tests%20Passing-brightgreen.svg)](#-automated-test-suite)
 [![Live Demo](https://img.shields.io/badge/Vercel-Live%20Production-blue.svg)](https://legallens-ai-phi.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![WCAG](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA%20Compliant-purple.svg)](#-accessibility--wcag-21-aa-standards)
 [![Security](https://img.shields.io/badge/Security-Zero%20Retention%20%7C%20Strict%20CSP%20%7C%20Rate%20Limited-orange.svg)](#-security--privacy-architecture)
 
-> **Demystify complex legal contracts with instant plain-language intelligence, cryptographic caching, grounded Q&A, side-by-side comparison, and portfolio due diligence.**
+> **Empowering individuals, tenants, freelancers, and small businesses with instant contract comprehension, grounded Q&A, verifiable clause citations, side-by-side comparison, and portfolio due diligence.**
 
-🌐 **Live Vercel Application:** [https://legallens-ai-phi.vercel.app](https://legallens-ai-phi.vercel.app)  
+🌐 **Live Production Studio:** [https://legallens-ai-phi.vercel.app](https://legallens-ai-phi.vercel.app)  
 📦 **GitHub Repository:** [https://github.com/ronak2410/LegalLens-AI](https://github.com/ronak2410/LegalLens-AI)
 
 ---
 
 ## 🛡️ Critical Legal & Ethical Disclaimer
-> **LegalLens AI provides educational and informational legal document analysis and is NOT a law firm or a substitute for qualified legal advice.**
+> **LegalLens AI provides educational and informational legal document analysis and is NOT a law firm or a substitute for professional legal advice.**
 >
 > The platform assists individuals, tenants, freelancers, and small businesses in identifying potential contract risks, obligations, and negotiation opportunities. It does not provide binding legal counsel, formal representation, or enforceability guarantees. Always consult a licensed attorney for specific legal matters.
+
+---
+
+## 🎯 Problem Statement Alignment (PromptWars: AI for Legal Assistance & Access)
+
+LegalLens AI directly addresses the fundamental challenges of legal document comprehension and access to justice:
+
+| Challenge Requirement | LegalLens AI Solution | Implementation Details |
+| :--- | :--- | :--- |
+| **1. Plain-Language Translation** | Converts dense legalese into clear, actionable executive summaries with *"What this means for you"* takeaways. | Heuristic NLP + Google Gemini 1.5 Flash |
+| **2. Asymmetric Risk Detection** | Automatically flags unilateral liabilities, uncapped indemnities, automatic renewals, and hidden fees. | ReDoS-safe linear regex engine + 0–100 risk score dial |
+| **3. Actionable Negotiation Redlines** | Proposes fair-market replacement counter-clauses with 1-click clipboard copying. | Standardized protective legal redline templates |
+| **4. Grounded Document Q&A** | Answers inquiries strictly against active document text with verified clause citations and honest refusal. | Dynamic citation indexing + anti-hallucination guardrails |
+| **5. Legal Literacy Glossary** | Dedicated interactive dictionary demystifying common contractual terms (Indemnity, Severability, Liquidated Damages). | Searchable `tab-glossary` & accessible reference modal |
+| **6. Attorney Preparation Checklist** | Generates tailored pre-signing checklists and high-impact consultation questions for lawyer meetings. | Structured risk-based query generator |
+| **7. Multi-Contract Due Diligence** | Concurrently batch-audits 2 to 10 contracts to detect jurisdictional fragmentation and timeline milestones. | Multi-threaded portfolio analysis engine |
 
 ---
 
@@ -26,16 +42,17 @@
 ```mermaid
 flowchart TD
     subgraph Client_Layer [Client & Access Layer]
-        WebUI[Modern Web Studio - HTML5/CSS3/ES6]
+        WebUI[Modern Accessible Web Studio - HTML5/CSS3/ES6]
         Ext[Chrome / Edge Extension - Manifest V3]
-        Glossary[Plain-Language Legal Glossary Modal]
+        Glossary[Interactive Legal Terms Glossary]
+        Toasts[Accessible Live Region Toast System]
     end
 
     subgraph Edge_Gateway [Vercel Edge & Middleware]
         CDN[Edge Static Asset Hosting]
         GZip[GZip Compression Middleware]
         RateLimiter[Sliding Window Rate Limiter - 120 req/min]
-        SecHeaders[Strict CSP & Anti-Sniff Headers]
+        SecHeaders[Strict CSP & Anti-Clickjacking Headers]
     end
 
     subgraph Core_Engine [LegalLens Intelligence Core]
@@ -67,81 +84,61 @@ flowchart TD
 
 ---
 
-## 🌟 Core Features & Capabilities
+## ♿ Accessibility & WCAG 2.1 AA Compliance
 
-| Feature | Description | Performance / Spec |
-| :--- | :--- | :--- |
-| **Multimodal Ingestion** | Extracts clean text from PDF, OCR Scanned PDFs, DOCX, and TXT | Up to 15MB file size limit |
-| **SHA-256 LRU Caching** | Instant sub-millisecond document evaluation deduplication | `< 1ms` latency on cache hits |
-| **Risk Scoring & Matrix** | 0–100 Normalized risk profile with color-coded severity tags | Low / Medium / High severity |
-| **Grounded "Ask Document"** | Q&A with dynamic clickable clause citations and honest refusal | Anti-hallucination guardrails |
-| **Side-by-Side Comparison** | Compares draft revisions with quantified Risk Shift Delta | Clause-by-clause diff |
-| **Portfolio Due Diligence** | Concurrently batch-analyzes 2 to 10 contracts with milestone timelines | Cross-contract conflict detection |
-| **Negotiation Redlines** | AI-generated replacement clauses with 1-click clipboard copy | Standardized fair-market terms |
-| **Legal Terms Glossary** | Interactive reference modal defining 8+ common contract clauses | Zero-friction legal literacy |
-| **Export Generator** | Instant client-side & server-side DOCX and Markdown briefing reports | Complete structured audit |
-| **Browser Extension** | Manifest V3 1-click ToS scanner with seamless studio handoff | Instant webpage scraping |
+- **Zero Blocking Dialogs**: 100% replaced intrusive `window.alert()` popups with non-blocking, accessible toast notifications (`role="status"`, `aria-live="polite"`).
+- **Keyboard Navigation**: Skip-to-content anchor (`<a href="#main-content" class="skip-link">`), logical tab stops, and modal focus management with `Escape` key dismissal.
+- **Focus Indicators**: High-contrast 2px `:focus-visible` outlines on all interactive elements.
+- **Screen Reader Landmarks**: Semantic HTML5 landmark tags (`<header>`, `<nav>`, `<main>`, `<aside>`, `<section role="tabpanel">`).
+- **Reduced Motion Support**: Dedicated `@media (prefers-reduced-motion: reduce)` rules disable transitions and animations for users with vestibular sensitivities.
+- **Color Contrast**: 5:1+ contrast ratio across dark mode surfaces and status indicators.
 
 ---
 
 ## 🔒 Security & Privacy Architecture
 
-LegalLens AI adheres to strict zero-trust and zero-retention principles:
-1. **Zero Data Retention**: Document text is processed in volatile memory only and never saved to a database or non-volatile storage.
-2. **Cryptographic Deduplication**: Caching keys are SHA-256 hashed without storing raw user PII.
-3. **Abuse Protection**: Sliding window rate limiter (120 requests/minute per client).
-4. **ReDoS Immunity**: All regular expressions use bounded lookaheads and maximum length limits.
-5. **Hardened HTTP Headers**: Emits strict `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy`.
+- **Zero Data Retention**: Document text is processed purely in volatile RAM and is never persisted to non-volatile disk or database.
+- **SHA-256 LRU Cache**: Cryptographic hashing deduplicates identical documents without exposing raw PII.
+- **Rate Limiting**: In-memory sliding-window limiter enforcing 120 requests/minute per client IP.
+- **ReDoS Immunity**: Linear pattern complexity with strict 120-character regex length bounds.
+- **Hardened HTTP Headers**: Emits strict `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy`.
+- **Payload Boundaries**: 15MB maximum file size ceiling strictly validated on both client and backend middleware.
 
 ---
 
-## ♿ Accessibility (WCAG 2.1 AA Compliant)
+## 🧪 Automated Test Suite
 
-- **Keyboard First**: Full keyboard navigation, skip-to-content anchor, and Escape key modal dismissals.
-- **Focus Indicators**: High-contrast 2px `:focus-visible` outlines on all interactive elements.
-- **Screen Reader Ready**: Semantic HTML5 landmark tags, full ARIA roles (`role="tablist"`, `role="tab"`, `role="dialog"`), and dynamic `aria-live` status regions.
-- **Color Contrast**: 4.5:1+ contrast ratios across dark mode and status indicators.
+```bash
+python -m pytest tests/ -v
+```
+
+### 43 Tests Across 6 Dedicated Test Suites:
+1. `tests/test_accessibility_and_compliance.py`: Validates HTML semantic landmarks, ARIA tablist patterns, modal accessibility, reduced motion CSS, and absence of blocking alerts.
+2. `tests/test_qa_guardrails_and_citations.py`: Verifies grounded Q&A citations, adversarial prompt injection refusal, and suggested inquiries.
+3. `tests/test_legal_engine.py`: Dynamic clause segmentation, novel contract heuristic evaluation, grounded citation extraction, out-of-scope refusal, and comparator delta calculations.
+4. `tests/test_parser_and_security.py`: 15MB file rejection, ReDoS safety validation, XSS escaping, and HTTP security headers.
+5. `tests/test_batch_and_export.py`: Concurrent multi-contract due diligence, timeline generation, DOCX/Markdown streaming, suggested questions, and sample catalog endpoints.
+6. `tests/test_rate_limit_and_cache.py`: SHA-256 LRU cache hit performance (<1ms), GZip compression, and 120 req/min rate limiter headers.
+7. `tests/test_edge_cases_and_fuzzing.py`: Empty strings, whitespace fuzzing, Unicode stress testing, and corrupted file extension handling.
 
 ---
 
 ## 🚀 Quick Start & Installation
 
-### Prerequisites
-- Python 3.10+
-- Modern Web Browser
-
-### Local Installation & Execution
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/ronak2410/LegalLens-AI.git
 cd LegalLens-AI
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the application server
+# Start application server
 python run.py
 ```
 *(On Windows, you can also double-click `run.bat`)*
 
 Open your browser at: **`http://localhost:8000`**
-
----
-
-## 🧪 Automated Test Suite
-
-The project includes 31 comprehensive unit and integration tests across 5 test suites:
-
-```bash
-python -m pytest tests/ -v
-```
-
-### Test Suite Breakdown
-- `tests/test_legal_engine.py`: Dynamic clause segmentation, novel contract heuristic evaluation, grounded citation extraction, out-of-scope refusal, and comparator delta calculations.
-- `tests/test_parser_and_security.py`: 15MB file rejection, ReDoS safety validation, XSS escaping, and HTTP security headers.
-- `tests/test_batch_and_export.py`: Concurrent multi-contract due diligence, timeline generation, DOCX/Markdown streaming, suggested questions, and sample catalog endpoints.
-- `tests/test_rate_limit_and_cache.py`: SHA-256 LRU cache hit performance, GZip compression, and 120 req/min rate limiter headers.
-- `tests/test_edge_cases_and_fuzzing.py`: Empty strings, whitespace fuzzing, Unicode stress testing, and corrupted file extension handling.
 
 ---
 

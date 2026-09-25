@@ -1,6 +1,10 @@
 /**
  * LegalLens AI - Analysis Dashboard Controller
+ * Renders risk scores, executive plain-language summaries, redlines, and manages briefing exports.
+ * @file analysis.js
  */
+
+"use strict";
 
 let activeAnalysisData = null;
 
@@ -22,8 +26,10 @@ function renderAnalysisDashboard(data) {
 
   // Update sidebar indicator
   const sideBadge = document.getElementById("sidebar-risk-badge");
-  sideBadge.className = `nav-badge ${risk.level === 'High' ? 'badge-danger' : risk.level === 'Medium' ? 'badge-warning' : 'badge-success'}`;
-  sideBadge.innerText = `${risk.level} Risk`;
+  if (sideBadge) {
+    sideBadge.className = `nav-badge ${risk.level === 'High' ? 'badge-danger' : risk.level === 'Medium' ? 'badge-warning' : 'badge-success'}`;
+    sideBadge.innerText = `${risk.level} Risk`;
+  }
 
   // 2. Executive Plain Summary
   const plainContainer = document.getElementById("plainSummaryContainer");
@@ -91,7 +97,7 @@ function renderAnalysisDashboard(data) {
     div.style.cssText = "display: flex; align-items: center; gap: 8px; font-size: 13px; color: #CBD5E1;";
     const pBadge = chk.priority === "Urgent" ? "badge-danger" : chk.priority === "High" ? "badge-warning" : "badge-secondary";
     div.innerHTML = `
-      <input type="checkbox" style="accent-color: var(--accent-cyan);">
+      <input type="checkbox" style="accent-color: var(--accent-cyan);" aria-label="${escapeHtml(chk.label)}">
       <span style="flex: 1;">${escapeHtml(chk.label)}</span>
       <span class="badge ${pBadge}" style="font-size: 10px;">${escapeHtml(chk.priority)}</span>
     `;
@@ -118,6 +124,7 @@ function copyRedlineText(idx) {
       btn.innerText = "Copied!";
       setTimeout(() => { btn.innerText = "Copy Proposed Clause"; }, 2000);
     }
+    showToast("Proposed redline copied to clipboard.", "success");
   }
 }
 
@@ -170,6 +177,7 @@ async function downloadLegalBriefMarkdown() {
     a.href = URL.createObjectURL(blob);
     a.download = `${titleToUse.replace(/\s+/g, '_')}_LegalLens_Report.md`;
     a.click();
+    showToast("Downloaded Legal Briefing Report (.md)", "success");
     return;
   }
 
@@ -191,6 +199,7 @@ async function downloadLegalBriefMarkdown() {
       a.href = URL.createObjectURL(blob);
       a.download = data.filename || "LegalLens_Report.md";
       a.click();
+      showToast("Downloaded Legal Briefing Report (.md)", "success");
       return;
     }
   } catch (err) {
@@ -204,6 +213,7 @@ async function downloadLegalBriefMarkdown() {
   a.href = URL.createObjectURL(blob);
   a.download = `${titleToUse.replace(/\s+/g, '_')}_LegalLens_Report.md`;
   a.click();
+  showToast("Downloaded Legal Briefing Report (.md)", "success");
 }
 
 async function downloadLegalBriefDocx() {
@@ -226,6 +236,7 @@ async function downloadLegalBriefDocx() {
       a.href = URL.createObjectURL(blob);
       a.download = `${titleToUse.replace(/\s+/g, '_')}_LegalLens_Report.docx`;
       a.click();
+      showToast("Downloaded Word Briefing Report (.docx)", "success");
       return;
     }
   } catch (err) {

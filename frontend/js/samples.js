@@ -3,6 +3,8 @@
  * Includes embedded local fallback for zero-latency offline & serverless resilience.
  */
 
+"use strict";
+
 const EMBEDDED_SAMPLES = {
   "residential_lease": {
     "id": "residential_lease",

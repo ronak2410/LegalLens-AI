@@ -1,6 +1,10 @@
 /**
  * LegalLens AI - Multi-Document Due Diligence Portfolio Controller
+ * Batch audits 2 to 10 contracts concurrently to surface cross-contract contradictions and milestones.
+ * @file portfolio.js
  */
+
+"use strict";
 
 let queuedBatchFiles = [];
 let activePortfolioData = null;
@@ -11,7 +15,7 @@ function handleBatchFileSelect(event) {
 
   for (const file of files) {
     if (file.size > 15 * 1024 * 1024) {
-      alert(`File '${file.name}' exceeds the 15MB limit and was skipped.`);
+      showToast(`File '${file.name}' exceeds the 15MB limit and was skipped.`, "warning");
       continue;
     }
     if (!queuedBatchFiles.some(f => f.name === file.name)) {
@@ -19,6 +23,7 @@ function handleBatchFileSelect(event) {
     }
   }
   updateBatchFileListUI();
+  showToast(`Added ${files.length} document(s) to portfolio queue.`, "info");
 }
 
 function updateBatchFileListUI() {
@@ -61,41 +66,55 @@ function updateBatchFileListUI() {
 function removeBatchFile(index) {
   queuedBatchFiles.splice(index, 1);
   updateBatchFileListUI();
+  showToast("File removed from queue.", "info");
 }
 
 function clearBatchQueue() {
   queuedBatchFiles = [];
   updateBatchFileListUI();
   document.getElementById("batchResultsDashboard").style.display = "none";
+  showToast("Portfolio queue cleared.", "info");
 }
 
 async function loadSamplePortfolio() {
   try {
-    const res = await fetch("/api/samples");
-    const data = await res.json();
     queuedBatchFiles = [];
-    
-    for (const s of data.samples) {
-      const detailRes = await fetch(`/api/samples/${s.id}`);
-      const doc = await detailRes.json();
-      queuedBatchFiles.push({
-        name: `${doc.title}.txt`,
-        text: doc.text,
-        isVirtual: true,
-        size: doc.text.length
+    if (typeof EMBEDDED_SAMPLES !== "undefined") {
+      Object.keys(EMBEDDED_SAMPLES).forEach(k => {
+        const doc = EMBEDDED_SAMPLES[k];
+        queuedBatchFiles.push({
+          name: `${doc.title}.txt`,
+          text: doc.text,
+          isVirtual: true,
+          size: doc.text.length
+        });
       });
+    } else {
+      const res = await fetch("/api/samples");
+      const data = await res.json();
+      for (const s of data.samples) {
+        const detailRes = await fetch(`/api/samples/${s.id}`);
+        const doc = await detailRes.json();
+        queuedBatchFiles.push({
+          name: `${doc.title}.txt`,
+          text: doc.text,
+          isVirtual: true,
+          size: doc.text.length
+        });
+      }
     }
 
     updateBatchFileListUI();
+    showToast("Loaded 4 pre-configured contracts into Due Diligence Hub.", "success");
     executeBatchAnalysis();
   } catch (err) {
-    alert("Error loading sample portfolio: " + err.message);
+    showToast("Error loading sample portfolio: " + err.message, "error");
   }
 }
 
 async function executeBatchAnalysis() {
   if (queuedBatchFiles.length === 0) {
-    alert("Please upload or drop at least one document for portfolio analysis.");
+    showToast("Please upload or select at least one document for portfolio analysis.", "warning");
     return;
   }
 
@@ -141,8 +160,9 @@ async function executeBatchAnalysis() {
 
     activePortfolioData = result;
     renderPortfolioDashboard(result);
+    showToast("Portfolio due diligence analysis complete.", "success");
   } catch (err) {
-    alert("Batch Due Diligence Error: " + err.message);
+    showToast("Batch Due Diligence Error: " + err.message, "error");
   }
 }
 
@@ -244,4 +264,5 @@ function exportBatchMarkdown() {
   a.href = URL.createObjectURL(blob);
   a.download = `LegalLens_Due_Diligence_Portfolio_Report.md`;
   a.click();
+  showToast("Downloaded portfolio briefing report (.md)", "success");
 }

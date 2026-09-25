@@ -1,14 +1,52 @@
 /**
  * LegalLens AI - Main Application & State Coordinator
+ * Handles tab routing, modal focus management, accessible toasts, and state persistence.
+ * @file app.js
  */
+
+"use strict";
 
 let activeDocumentText = "";
 let activeDocumentTitle = "Residential Lease";
 let activePlaybookRules = [];
 let sessionApiKey = "";
 
+// ----------------- Toast Notification System (WCAG Accessible) -----------------
+
+/**
+ * Displays a non-intrusive, accessible toast notification.
+ * @param {string} message - Text to display
+ * @param {"info"|"success"|"warning"|"error"} type - Severity level
+ */
+function showToast(message, type = "info") {
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  toast.setAttribute("role", type === "error" ? "alert" : "status");
+
+  const icon = type === "success" ? "✓" : type === "error" ? "✕" : type === "warning" ? "⚠️" : "ℹ️";
+  toast.innerHTML = `<span aria-hidden="true">${icon}</span> <span>${escapeHtml(message)}</span>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    toast.style.transition = "all 0.3s ease";
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, 3500);
+}
+
 // ----------------- Tab Navigation & Accessible State -----------------
 
+/**
+ * Switches the active tab view and updates ARIA landmarks.
+ * @param {string} tabId - Target tab element ID
+ */
 function switchTab(tabId) {
   // Update all tab panels
   document.querySelectorAll(".tab-content").forEach(el => {
@@ -40,7 +78,8 @@ function switchTab(tabId) {
     "tab-compare": "Compare Documents",
     "tab-portfolio": "Due Diligence Hub",
     "tab-playbooks": "Negotiation Playbooks",
-    "tab-settings": "Privacy & Safety"
+    "tab-settings": "Privacy & Safety",
+    "tab-glossary": "Legal Glossary"
   };
   const titleEl = document.getElementById("current-view-title");
   if (titleEl && titles[tabId]) {
@@ -69,6 +108,11 @@ function toggleMobileSidebar() {
 
 // ----------------- Document State & Analysis -----------------
 
+/**
+ * Sets the active contract text and updates sidebar metadata.
+ * @param {string} text - Raw document string
+ * @param {string} title - Human readable document title
+ */
 function setActiveDocument(text, title) {
   activeDocumentText = text;
   activeDocumentTitle = title || "Contract.txt";
@@ -79,6 +123,11 @@ function setActiveDocument(text, title) {
   }
 }
 
+/**
+ * Dispatches analysis request to FastAPI backend with fallback.
+ * @param {string} text - Contract text
+ * @param {string} filename - Document filename
+ */
 async function executeAnalysis(text, filename) {
   const loadingIndicator = document.getElementById("analysisLoading");
   if (loadingIndicator) loadingIndicator.style.display = "block";
@@ -103,9 +152,10 @@ async function executeAnalysis(text, filename) {
     }
     const data = await res.json();
     renderAnalysisDashboard(data);
+    showToast(`Analysis completed for ${filename}`, "success");
   } catch (err) {
     console.error("Analysis Error:", err);
-    // Display in dashboard without intrusive window.alert popups
+    showToast("Server analysis unavailable. Loaded local assessment.", "warning");
     const container = document.getElementById("analysisResultsContainer");
     if (container) {
       container.innerHTML = `
@@ -123,7 +173,7 @@ async function executeAnalysis(text, filename) {
 function analyzePastedText() {
   const text = document.getElementById("pasteContractText").value.trim();
   if (!text || text.length < 50) {
-    alert("Please enter or paste at least 50 characters of contract text.");
+    showToast("Please enter or paste at least 50 characters of contract text.", "warning");
     return;
   }
 
@@ -136,6 +186,7 @@ function clearUploadFields() {
   document.getElementById("pasteContractText").value = "";
   const fileInput = document.getElementById("singleFileInput");
   if (fileInput) fileInput.value = "";
+  showToast("Upload inputs cleared.", "info");
 }
 
 async function handleSingleFileSelect(event) {
@@ -143,7 +194,7 @@ async function handleSingleFileSelect(event) {
   if (!file) return;
 
   if (file.size > 15 * 1024 * 1024) {
-    alert(`File '${file.name}' exceeds the maximum allowable size of 15MB.`);
+    showToast(`File '${file.name}' exceeds the maximum allowable size of 15MB.`, "error");
     return;
   }
 
@@ -170,8 +221,9 @@ async function handleSingleFileSelect(event) {
     setActiveDocument(data.extracted_text, file.name);
     switchTab("tab-analysis");
     renderAnalysisDashboard(data);
+    showToast(`Uploaded and analyzed ${file.name}`, "success");
   } catch (err) {
-    alert("Upload Error: " + err.message);
+    showToast("Upload Error: " + err.message, "error");
   }
 }
 
@@ -238,7 +290,7 @@ function loadPlaybookPreset(presetName) {
   if (PLAYBOOK_PRESETS[presetName]) {
     activePlaybookRules = [...PLAYBOOK_PRESETS[presetName]];
     renderPlaybookRulesUI();
-    alert(`Loaded '${presetName}' negotiation playbook preset with ${activePlaybookRules.length} rules.`);
+    showToast(`Loaded '${presetName}' playbook preset (${activePlaybookRules.length} rules).`, "success");
   }
 }
 
@@ -249,7 +301,7 @@ function saveCustomRule() {
   const category = document.getElementById("ruleCategoryInput").value.trim() || "Custom Playbook";
 
   if (!title || !pattern) {
-    alert("Please enter both a Rule Title and a Keyword / Regex Pattern.");
+    showToast("Please enter both a Rule Title and a Keyword / Regex Pattern.", "warning");
     return;
   }
 
@@ -265,11 +317,13 @@ function saveCustomRule() {
   document.getElementById("ruleTitleInput").value = "";
   document.getElementById("rulePatternInput").value = "";
   renderPlaybookRulesUI();
+  showToast("Custom rule added to active playbook.", "success");
 }
 
 function clearPlaybookRules() {
   activePlaybookRules = [];
   renderPlaybookRulesUI();
+  showToast("Playbook rules reset to default.", "info");
 }
 
 function getActivePlaybookRules() {
@@ -309,6 +363,94 @@ function renderPlaybookRulesUI() {
 function removePlaybookRule(idx) {
   activePlaybookRules.splice(idx, 1);
   renderPlaybookRulesUI();
+  showToast("Rule removed from playbook.", "info");
+}
+
+// ----------------- Legal Glossary System -----------------
+
+const GLOSSARY_TERMS = [
+  {
+    term: "Indemnification (Hold Harmless)",
+    category: "Liability",
+    summary: "An agreement where you promise to pay the other party's legal defense costs and court damages if someone sues them because of your work. Watch out for uncapped or one-sided indemnities."
+  },
+  {
+    term: "Liquidated Damages",
+    category: "Penalties",
+    summary: "A pre-agreed fixed dollar penalty you must pay if you break the contract early, regardless of whether the other party suffered real financial losses."
+  },
+  {
+    term: "Severability Clause",
+    category: "Enforceability",
+    summary: "Ensures that if a court rules one specific clause illegal or unenforceable, the rest of the contract remains active and legally binding."
+  },
+  {
+    term: "Governing Law & Forum Selection",
+    category: "Jurisdiction",
+    summary: "Decides which state's laws control the contract and which city or court you must travel to if formal litigation occurs."
+  },
+  {
+    term: "Force Majeure",
+    category: "Performance",
+    summary: "Excuses parties from performance obligations during unforeseeable catastrophic events (natural disasters, pandemics, government actions)."
+  },
+  {
+    term: "Work Made for Hire",
+    category: "Intellectual Property",
+    summary: "A copyright doctrine meaning the client automatically owns everything you create from day one, including preliminary sketches or custom code."
+  },
+  {
+    term: "Non-Compete Covenant",
+    category: "Restrictive Covenants",
+    summary: "Restricts your freedom to work in your industry, start a competing company, or accept contracts with similar clients for a specified duration after termination."
+  },
+  {
+    term: "Limitation of Liability",
+    category: "Liability",
+    summary: "Caps the maximum dollar amount one or both parties can recover in damages. A balanced contract typically caps liability to 12 months' fees."
+  }
+];
+
+function initGlossary() {
+  renderGlossaryGrid(GLOSSARY_TERMS);
+}
+
+function filterGlossaryTerms() {
+  const query = (document.getElementById("glossarySearchInput")?.value || "").toLowerCase().trim();
+  if (!query) {
+    renderGlossaryGrid(GLOSSARY_TERMS);
+    return;
+  }
+  const filtered = GLOSSARY_TERMS.filter(item => 
+    item.term.toLowerCase().includes(query) || 
+    item.summary.toLowerCase().includes(query) ||
+    item.category.toLowerCase().includes(query)
+  );
+  renderGlossaryGrid(filtered);
+}
+
+function renderGlossaryGrid(items) {
+  const grid = document.getElementById("glossaryTermsGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  if (items.length === 0) {
+    grid.innerHTML = `<div style="color: var(--text-muted); font-size: 13.5px;">No legal terms matching your search query.</div>`;
+    return;
+  }
+
+  items.forEach(item => {
+    const card = document.createElement("div");
+    card.style.cssText = "background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); padding: 14px; border-radius: 8px;";
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h3 style="font-size: 14px; color: var(--accent-cyan); font-weight: 700;">${escapeHtml(item.term)}</h3>
+        <span class="badge badge-secondary" style="font-size: 10px;">${escapeHtml(item.category)}</span>
+      </div>
+      <p style="font-size: 13px; color: #CBD5E1; line-height: 1.5; margin: 0;">${escapeHtml(item.summary)}</p>
+    `;
+    grid.appendChild(card);
+  });
 }
 
 // ----------------- Privacy, Safety & Session Data -----------------
@@ -320,18 +462,18 @@ function saveApiKey() {
   if (!key) {
     sessionApiKey = "";
     localStorage.removeItem("legallens_gemini_key");
-    alert("API Key cleared.");
+    showToast("API Key removed.", "info");
     return;
   }
 
   if (sessionOnly) {
     sessionApiKey = key;
     localStorage.removeItem("legallens_gemini_key");
-    alert("API Key saved for current session only. (Will be discarded when tab is closed)");
+    showToast("API Key saved for current tab session only.", "success");
   } else {
     sessionApiKey = key;
     localStorage.setItem("legallens_gemini_key", key);
-    alert("API Key saved securely in your browser's localStorage.");
+    showToast("API Key securely saved in browser storage.", "success");
   }
 }
 
@@ -349,11 +491,11 @@ function purgeAllSessionData() {
   clearBatchQueue();
   activePlaybookRules = [];
   renderPlaybookRulesUI();
-  alert("All local session data and document memory purged.");
+  showToast("All local session data and document memory purged.", "success");
   switchTab("tab-landing");
 }
 
-// ----------------- Modals Management (with Focus Trap & Escape) -----------------
+// ----------------- Modals Management (Focus Trap & Escape) -----------------
 
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
@@ -396,8 +538,9 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-// Handle Browser Extension / URL Query Handoff
+// Handle Browser Extension / URL Query Handoff & Glossary Init
 document.addEventListener("DOMContentLoaded", () => {
+  initGlossary();
   const params = new URLSearchParams(window.location.search);
   if (params.get("ext_scan") === "1" || params.get("text")) {
     const passedText = params.get("text") || "";

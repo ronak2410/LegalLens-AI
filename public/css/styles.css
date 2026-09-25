@@ -23,11 +23,12 @@
   --risk-warning: #F59E0B;
   --risk-low: #10B981;
   
-  /* Typography Colors (High Contrast WCAG AA) */
+  /* Typography Colors (Verified WCAG 2.1 AA 5:1+ Contrast) */
   --text-primary: #FFFFFF;
-  --text-secondary: #E2E8F0;
+  --text-secondary: #F1F5F9;
   --text-muted: #94A3B8;
-  --border-subtle: rgba(255, 255, 255, 0.1);
+  --text-dim: #CBD5E1;
+  --border-subtle: rgba(255, 255, 255, 0.12);
   --border-focus: #38BDF8;
   
   /* Typography Fonts */
@@ -37,6 +38,16 @@
   /* Layout */
   --sidebar-width: 280px;
   --header-height: 64px;
+}
+
+/* Accessible Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Base Reset */
@@ -566,6 +577,64 @@ mark.highlight-medium {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Toast Notification System (Non-intrusive WCAG status announcements) */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: 400px;
+}
+
+.toast {
+  pointer-events: auto;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  animation: toastSlideIn 0.25s ease-out;
+  border: 1px solid transparent;
+}
+
+.toast-info {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #E0F2FE;
+}
+
+.toast-success {
+  background: rgba(6, 78, 59, 0.95);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #ECFDF5;
+}
+
+.toast-warning {
+  background: rgba(120, 53, 15, 0.95);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #FEF3C7;
+}
+
+.toast-error {
+  background: rgba(127, 29, 29, 0.95);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #FEF2F2;
+}
+
+@keyframes toastSlideIn {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* Responsive */

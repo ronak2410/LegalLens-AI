@@ -48,72 +48,86 @@ def answer_document_question(question: str, document_text: str, document_title: 
         if gemini_ans:
             return gemini_ans
 
-    # 2. Out-of-Scope / General Trivia filter
-    unrelated_keywords = [
-        "recipe", "weather", "president", "capital of", "who wrote", "song", "joke", "code a python", "write an essay"
+    # 2. Adversarial Prompt Injection & Out-of-Scope Filter
+    prompt_injection_terms = [
+        "ignore all previous", "system override", "ignore previous instructions", "roleplay", "secret_api_key",
+        "system prompt", "jailbreak", "print api key", "bypass"
     ]
-    if any(k in q_clean for k in unrelated_keywords):
+    unrelated_keywords = [
+        "recipe", "weather", "president", "capital of", "who wrote", "song", "joke", "code a python", "write an essay", "distance between", "chocolate cake"
+    ]
+    if any(k in q_clean for k in prompt_injection_terms) or any(k in q_clean for k in unrelated_keywords):
         return {
             "is_grounded": False,
-            "answer": "This inquiry is unrelated to the provided legal agreement. LegalLens AI strictly provides document-grounded legal information extracted directly from your contract text.",
+            "answer": "This inquiry is unrelated and outside the scope of the provided legal agreement. LegalLens AI strictly provides document-grounded legal information extracted directly from your contract text.",
             "citation": "Out of Scope",
             "excerpt": "",
-            "explanation": "No relevant provisions exist in this document regarding this general topic.",
+            "explanation": "No relevant contractual provisions exist in this document regarding this inquiry.",
             "confidence": 0.99
         }
 
     # 3. Intelligent Grounded Citation Search across Document
     topic_patterns = [
         (
-            ["terminate", "termination", "cancel", "exit", "end the lease", "end the contract", "early exit"],
-            r'(?:early termination|termination for convenience|term and termination|cancel|expiration).*?(?:notice|penalty|fee|month|\$)',
-            "Early Termination & Exit Rights"
+            ["late fee", "late charge", "overdue", "late penalty"],
+            r'(?:late charge|late fee|daily penalty|delinquent)[^\n\r]+(?:\n[^\n\r]+)?',
+            "Late Charges & Payment Penalties"
+        ),
+        (
+            ["monthly rent", "base rent", "how much is the rent", "rent amount", "pay per month"],
+            r'(?:base monthly rent|monthly rent is|compensation|rate of \$)[^\n\r]+',
+            "Monthly Rent & Compensation"
+        ),
+        (
+            ["terminate", "termination", "early exit", "cancel the lease", "end the lease", "vacate"],
+            r'(?:early termination|termination fee|if tenant vacates|liable for an early termination)[^\n\r]+',
+            "Early Termination & Liquidated Damages"
         ),
         (
             ["renew", "renewal", "automatic renewal", "extend"],
-            r'(?:automatic renewal|renew for successive|notice of intent not to renew).*?(?:days|surcharge|market rate)',
+            r'(?:automatic renewal|renew for successive|notice of intent not to renew)[^\n\r]+',
             "Renewal & Notice Deadlines"
         ),
         (
-            ["pay", "payment", "fee", "rent", "invoice", "late", "cost", "price", "surcharge"],
-            r'(?:monthly rent|compensation|payment terms|invoicing|late charge|technology fee|valet trash).*?(?:\$\d+|\d+\s+days|net[\s\-]\d+)',
+            ["pay", "payment", "fee", "invoice", "cost", "price", "surcharge", "net-90"],
+            r'(?:monthly rent|compensation|payment terms|invoicing|technology fee|valet trash|net[\s\-]\d+)[^\n\r]+',
             "Payment Obligations & Surcharges"
         ),
         (
             ["indemnif", "liability", "hold harmless", "damage", "sue", "lawsuit", "breach"],
-            r'(?:indemnif|hold harmless|limitation of liability|aggregate liability).*?(?:damages|claims|fees|gross negligence)',
+            r'(?:indemnif|hold harmless|limitation of liability|aggregate liability)[^\n\r]+',
             "Liability & Indemnification"
         ),
         (
             ["intellectual property", "ip", "copyright", "ownership", "work for hire", "code"],
-            r'(?:intellectual property|work made for hire|pre-existing|background|patents|ownership).*?(?:sole and exclusive|assigns|retains)',
+            r'(?:intellectual property|work made for hire|pre-existing|background|patents|ownership)[^\n\r]+',
             "Intellectual Property & Ownership"
         ),
         (
             ["non-compete", "non-solicitation", "solicit", "compete", "restrict"],
-            r'(?:non[\s\-]compete|non[\s\-]solicitation|shall not directly or indirectly).*?(?:months|solicit|clients)',
+            r'(?:non[\s\-]compete|non[\s\-]solicitation|shall not directly or indirectly)[^\n\r]+',
             "Restrictive Covenants"
         ),
         (
             ["deposit", "security deposit", "cleaning fee", "refund"],
-            r'(?:security deposit|deposit amount|deductions & return).*?(?:\$\d+|\d+\s+days|cleaning fees)',
+            r'(?:security deposit|deposit amount|deductions & return)[^\n\r]+',
             "Security Deposit & Deductions"
         ),
         (
             ["guest", "visitor", "pets", "sublet", "occupant"],
-            r'(?:guest limitations|pets|unauthorized subtenant|quiet enjoyment).*?(?:nights|pet fee|\$\d+)',
+            r'(?:guest limitations|pets|unauthorized subtenant|quiet enjoyment)[^\n\r]+',
             "Use, Guests & Property Rules"
         ),
         (
             ["governing law", "jurisdiction", "court", "venue", "dispute", "jury"],
-            r'(?:governing law|dispute venue|waiver of jury trial|laws of the State of).*?(?:Texas|Delaware|California|New York|courts)',
+            r'(?:governing law|dispute venue|waiver of jury trial|laws of the State of)[^\n\r]+',
             "Governing Law & Disputes"
         )
     ]
 
     for keywords, regex_pat, topic_label in topic_patterns:
         if any(k in q_clean for k in keywords):
-            match = re.search(regex_pat, document_text, re.I | re.DOTALL)
+            match = re.search(regex_pat, document_text, re.I)
             if match:
                 raw_excerpt = match.group(0).strip()
                 # Clean excerpt length
@@ -121,9 +135,13 @@ def answer_document_question(question: str, document_text: str, document_title: 
                 
                 # Dynamic clause header detection near match
                 start_pos = match.start()
-                preceding_text = document_text[max(0, start_pos - 200):start_pos + 50]
-                clause_match = re.search(r'(?:(?:Section|Article|Clause)\s+)?(\d+(?:\.\d+)*|[A-Z]+)\.?\s+([A-Z\s,/\-\(\)]{3,40})', preceding_text, re.I)
-                citation = f"Clause {clause_match.group(1)}: {clause_match.group(2).strip().title()}" if clause_match else f"{topic_label}"
+                preceding_text = document_text[max(0, start_pos - 200):start_pos + 5]
+                clause_matches = re.findall(r'^(?:(?:Section|Article|Clause)\s+)?(\d+(?:\.\d+)*)\.?\s+([A-Za-z\s,/\-\(\)]{3,40})$', preceding_text, re.M)
+                if clause_matches:
+                    last_clause = clause_matches[-1]
+                    citation = f"Clause {last_clause[0]}: {last_clause[1].strip().title()}"
+                else:
+                    citation = f"{topic_label}"
 
                 return {
                     "is_grounded": True,

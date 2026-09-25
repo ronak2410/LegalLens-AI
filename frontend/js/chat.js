@@ -1,6 +1,10 @@
 /**
  * LegalLens AI - Document-Grounded Chat Controller
+ * Answers questions strictly grounded in active document text with verified citations.
+ * @file chat.js
  */
+
+"use strict";
 
 async function fetchSuggestedQuestions() {
   try {
@@ -9,7 +13,7 @@ async function fetchSuggestedQuestions() {
     const data = await res.json();
     renderSuggestionChips(data.categories);
   } catch (err) {
-    console.error("Failed to load suggested questions:", err);
+    console.warn("Failed to load suggested questions from server:", err);
   }
 }
 
@@ -26,8 +30,11 @@ function renderSuggestionChips(categories) {
       chip.style.padding = "4px 10px";
       chip.innerText = q;
       chip.onclick = () => {
-        document.getElementById("chatQuestionInput").value = q;
-        sendChatQuestion();
+        const input = document.getElementById("chatQuestionInput");
+        if (input) {
+          input.value = q;
+          sendChatQuestion();
+        }
       };
       container.appendChild(chip);
     });
@@ -36,11 +43,12 @@ function renderSuggestionChips(categories) {
 
 async function sendChatQuestion() {
   const input = document.getElementById("chatQuestionInput");
-  const question = input.value.trim();
+  const question = input?.value.trim();
   if (!question) return;
 
-  if (!activeDocumentText) {
-    alert("Please upload or select an active contract first.");
+  const textToUse = activeDocumentText || (typeof EMBEDDED_SAMPLES !== "undefined" && EMBEDDED_SAMPLES["residential_lease"] ? EMBEDDED_SAMPLES["residential_lease"].text : "");
+  if (!textToUse) {
+    showToast("Please upload or select an active contract first.", "warning");
     return;
   }
 
@@ -55,22 +63,24 @@ async function sendChatQuestion() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         question: question,
-        document_text: activeDocumentText,
+        document_text: textToUse,
         document_title: activeDocumentTitle,
         api_key: apiKey
       })
     });
 
-    if (!res.ok) throw new Error("Server error during Q&A");
+    if (!res.ok) throw new Error("Server response error during Q&A");
     const data = await res.json();
     appendChatMessage("assistant", data.answer, data.citation, data.excerpt, data.explanation, data.is_grounded);
   } catch (err) {
-    appendChatMessage("assistant", "Error: " + err.message, null, null, null, false);
+    appendChatMessage("assistant", "Unable to reach server. Please ensure your backend is active.", null, null, null, false);
   }
 }
 
 function appendChatMessage(sender, text, citation, excerpt, explanation, isGrounded) {
   const container = document.getElementById("chatHistoryContainer");
+  if (!container) return;
+
   const msgDiv = document.createElement("div");
   msgDiv.style.cssText = sender === "user" 
     ? "align-self: flex-end; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #FFF; padding: 10px 14px; border-radius: 8px; max-width: 80%; font-size: 13.5px;"

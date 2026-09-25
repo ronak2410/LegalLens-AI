@@ -1,20 +1,36 @@
 /**
  * LegalLens AI - Document Comparator Controller
+ * Side-by-side contract comparison and quantifiable Risk Shift Delta calculation.
+ * @file compare.js
  */
+
+"use strict";
 
 async function loadSampleComparison() {
   try {
-    const resA = await fetch("/api/samples/residential_lease");
-    const resB = await fetch("/api/samples/freelance_contract");
-    if (!resA.ok || !resB.ok) return;
-    const docA = await resA.json();
-    const docB = await resB.json();
+    let docAText = "";
+    let docBText = "";
 
-    document.getElementById("compareDoc1Text").value = docA.text;
-    document.getElementById("compareDoc2Text").value = docB.text;
+    if (typeof EMBEDDED_SAMPLES !== "undefined" && EMBEDDED_SAMPLES["residential_lease"] && EMBEDDED_SAMPLES["freelance_contract"]) {
+      docAText = EMBEDDED_SAMPLES["residential_lease"].text;
+      docBText = EMBEDDED_SAMPLES["freelance_contract"].text;
+    } else {
+      const resA = await fetch("/api/samples/residential_lease");
+      const resB = await fetch("/api/samples/freelance_contract");
+      if (resA.ok && resB.ok) {
+        const docA = await resA.json();
+        const docB = await resB.json();
+        docAText = docA.text;
+        docBText = docB.text;
+      }
+    }
+
+    document.getElementById("compareDoc1Text").value = docAText;
+    document.getElementById("compareDoc2Text").value = docBText;
+    showToast("Loaded sample comparison drafts.", "info");
     executeComparison();
   } catch (err) {
-    alert("Error loading sample comparison: " + err.message);
+    showToast("Error loading sample comparison: " + err.message, "error");
   }
 }
 
@@ -23,7 +39,7 @@ async function executeComparison() {
   const doc2 = document.getElementById("compareDoc2Text").value.trim();
 
   if (!doc1 || !doc2) {
-    alert("Please provide contract text for both Document A and Document B.");
+    showToast("Please provide contract text for both Document A and Document B.", "warning");
     return;
   }
 
@@ -39,22 +55,25 @@ async function executeComparison() {
       })
     });
 
-    if (!res.ok) throw new Error("Comparison error");
+    if (!res.ok) throw new Error("Comparison calculation failed on server.");
     const data = await res.json();
     renderComparisonResults(data);
+    showToast("Comparison analysis complete.", "success");
   } catch (err) {
-    alert("Comparison Error: " + err.message);
+    showToast("Comparison Error: " + err.message, "error");
   }
 }
 
 function renderComparisonResults(data) {
   const wrapper = document.getElementById("comparisonResultsWrapper");
+  if (!wrapper) return;
   wrapper.style.display = "block";
 
-  document.getElementById("compRiskShiftTitle").innerText = data.risk_shift_title;
-  document.getElementById("compRiskShiftSummary").innerText = data.risk_shift_summary;
+  document.getElementById("compRiskShiftTitle").innerText = data.risk_shift_title || "Comparison Matrix";
+  document.getElementById("compRiskShiftSummary").innerText = data.risk_shift_summary || "";
 
   const tbody = document.getElementById("comparisonMatrixBody");
+  if (!tbody) return;
   tbody.innerHTML = "";
 
   (data.comparison_matrix || []).forEach(row => {
