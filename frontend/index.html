@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LegalLens AI - Understand Legal Documents with Confidence</title>
+  <meta name="description" content="AI-powered legal information assistant that helps individuals, freelancers, and small businesses understand contracts, identify one-sided risks, ask grounded questions, and negotiate with redlines.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- WCAG Skip to Main Content Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebarNav" aria-label="Main Navigation">
+      <div class="sidebar-brand">
+        <div class="brand-icon" aria-hidden="true">⚖️</div>
+        <div>
+          <div class="brand-title">LegalLens AI</div>
+          <div class="brand-sub">Legal Assistance & Access</div>
+        </div>
+      </div>
+
+      <nav aria-label="Sidebar Sections">
+        <ul class="sidebar-menu" role="tablist">
+          <li role="presentation">
+            <button role="tab" id="tab-btn-landing" aria-selected="true" aria-controls="tab-landing" class="nav-item active" onclick="switchTab('tab-landing')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Overview</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-upload" aria-selected="false" aria-controls="tab-upload" class="nav-item" onclick="switchTab('tab-upload')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Upload Document</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-analysis" aria-selected="false" aria-controls="tab-analysis" class="nav-item" onclick="switchTab('tab-analysis')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Analysis Dashboard</span>
+              <span class="nav-badge badge-cyan" id="sidebar-risk-badge">Active</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-chat" aria-selected="false" aria-controls="tab-chat" class="nav-item" onclick="switchTab('tab-chat')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
+              <span>Ask the Document</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-compare" aria-selected="false" aria-controls="tab-compare" class="nav-item" onclick="switchTab('tab-compare')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Compare Documents</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-portfolio" aria-selected="false" aria-controls="tab-portfolio" class="nav-item" onclick="switchTab('tab-portfolio')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+              <span>Due Diligence Hub</span>
+              <span class="nav-badge badge-purple">Batch</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-playbooks" aria-selected="false" aria-controls="tab-playbooks" class="nav-item" onclick="switchTab('tab-playbooks')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span>Negotiation Playbooks</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button role="tab" id="tab-btn-settings" aria-selected="false" aria-controls="tab-settings" class="nav-item" onclick="switchTab('tab-settings')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Privacy & Safety</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-doc-badge">
+          <div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Active Document</div>
+            <div id="sidebar-doc-title" style="font-size: 12.5px; font-weight: 600; color: #FFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;">Residential Lease</div>
+          </div>
+          <button class="btn btn-sm btn-outline-cyan" onclick="switchTab('tab-upload')" aria-label="Change current active document">Change</button>
+        </div>
+
+        <button class="disclaimer-pill" onclick="openDisclaimerModal()" aria-label="Open legal disclaimer and information modal">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Legal information only. Not a lawyer or substitute for legal counsel.</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="workspace" id="main-content" role="main" tabindex="-1">
+      <!-- Top Sticky Header -->
+      <header class="top-header" role="banner">
+        <div class="top-header-left">
+          <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false" onclick="toggleMobileSidebar()">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <span class="breadcrumb-title" id="current-view-title">Overview</span>
+        </div>
+
+        <div class="top-header-right">
+          <button class="btn btn-secondary btn-sm" onclick="downloadLegalBriefMarkdown()" aria-label="Export Legal Brief as Markdown">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export Brief (.md)</span>
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="downloadLegalBriefDocx()" aria-label="Export Legal Brief as Word Document">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Export Word (.docx)</span>
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="switchTab('tab-upload')" aria-label="Analyze a new document">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Analyze Document</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Persistent Disclaimer Banner -->
+      <div class="safety-banner" role="region" aria-label="Safety Notice">
+        <div>
+          <span class="safety-banner-badge">Notice</span>
+          <span>LegalLens AI provides general legal information and is not a law firm, lawyer, or substitute for professional legal advice. Always consult a licensed attorney for binding legal decisions.</span>
+        </div>
+        <button class="btn-outline-cyan btn-sm" style="border:none; cursor:pointer;" onclick="openDisclaimerModal()">Learn More &rarr;</button>
+      </div>
+
+      <!-- ==================== TAB 1: LANDING PAGE ==================== -->
+      <section role="tabpanel" id="tab-landing" aria-labelledby="tab-btn-landing" class="tab-content active" tabindex="0">
+        <div style="text-align: center; max-width: 800px; margin: 20px auto 40px auto;">
+          <span class="badge badge-cyan" style="margin-bottom: 12px;">AI for Legal Assistance & Access</span>
+          <h1 style="font-family: var(--font-heading); font-size: 38px; color: #FFF; line-height: 1.2; margin-bottom: 16px;">
+            Understand legal documents with confidence.
+          </h1>
+          <p style="font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px;">
+            Demystify contracts, residential leases, and freelance agreements in plain language. Detect one-sided risks, ask document-grounded questions with citations, batch-audit portfolios, and negotiate balanced terms using AI redlines.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="switchTab('tab-upload')">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Upload Your Document (PDF/DOCX/TXT)</span>
+            </button>
+            <button class="btn btn-secondary" onclick="loadSampleContract('residential_lease')">
+              <span>Try Interactive Demo Lease</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pre-loaded Scenario Catalog -->
+        <div style="margin-top: 40px;">
+          <h2 style="font-family: var(--font-heading); font-size: 20px; color: #FFF; margin-bottom: 16px; text-align: center;">
+            Explore Everyday Legal Scenarios
+          </h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;" id="sampleCardsContainer">
+            <!-- Dynamically injected via samples.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: UPLOAD & ANALYZE ==================== -->
+      <section role="tabpanel" id="tab-upload" aria-labelledby="tab-btn-upload" class="tab-content" tabindex="0">
+        <div style="max-width: 900px; margin: 0 auto;">
+          <div class="card-container" style="margin-bottom: 24px;">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <h2>Upload or Paste Legal Document</h2>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+              Supports searchable and scanned PDFs (OCR), Word .docx, and raw .txt files (Maximum 15MB). Processed in volatile memory with zero persistent storage.
+            </p>
+
+            <div class="drop-zone" id="singleDropZone" onclick="document.getElementById('singleFileInput').click()" style="padding: 36px 20px; border: 2px dashed rgba(56, 189, 248, 0.4); border-radius: 12px; background: rgba(56, 189, 248, 0.03); text-align: center; cursor: pointer; transition: all 0.2s ease;">
+              <input type="file" id="singleFileInput" accept=".pdf,.docx,.txt" style="display: none;" onchange="handleSingleFileSelect(event)" aria-label="Select contract file to upload">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; color: var(--accent-cyan);" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
+              </div>
+              <h3 style="color: #FFF; font-size: 16px; font-weight: 600; margin-bottom: 4px;">Click to browse or drop your contract here</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">PDF, Word (.docx), or Text (.txt) up to 15MB</p>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <label for="pasteContractText" style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Or Paste Contract Text Directly</label>
+              <textarea id="pasteContractText" rows="8" placeholder="Paste full agreement text here..." style="width: 100%; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px; color: #FFF; font-family: var(--font-sans); font-size: 13.5px; margin-top: 6px; resize: vertical;"></textarea>
+            </div>
+
+            <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 12px;">
+              <button class="btn btn-secondary btn-sm" onclick="clearUploadFields()">Clear</button>
+              <button class="btn btn-primary" onclick="analyzePastedText()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Analyze Contract</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: ANALYSIS DASHBOARD ==================== -->
+      <section role="tabpanel" id="tab-analysis" aria-labelledby="tab-btn-analysis" class="tab-content" tabindex="0">
+        <!-- Top Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div class="card-container" style="border-left: 4px solid var(--risk-critical);">
+            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Overall Risk Score</div>
+            <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 8px;">
+              <span style="font-family: var(--font-heading); font-size: 32px; font-weight: 800; color: #FFF;" id="analysisRiskScore">--</span>
+              <span class="badge badge-danger" id="analysisRiskLevel">High Risk</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="analysisRiskDesc">Evaluating contract provisions...</p>
+          </div>
+
+          <div class="card-container" style="border-left: 4px solid var(--accent-cyan);">
+            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Document Type</div>
+            <div style="font-family: var(--font-heading); font-size: 20px; font-weight: 700; color: #FFF; margin-top: 8px;" id="analysisDocType">Residential Lease</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="analysisWordCount">~1,200 words</p>
+          </div>
+
+          <div class="card-container" style="border-left: 4px solid var(--risk-warning);">
+            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Flagged Risk Clauses</div>
+            <div style="font-family: var(--font-heading); font-size: 32px; font-weight: 800; color: var(--risk-warning); margin-top: 8px;" id="analysisFlagCount">0</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Asymmetries & potential traps</p>
+          </div>
+
+          <div class="card-container" style="border-left: 4px solid var(--risk-low);">
+            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Action Deliverables</div>
+            <div style="font-family: var(--font-heading); font-size: 32px; font-weight: 800; color: var(--risk-low); margin-top: 8px;" id="analysisActionCount">0</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Pre-signing checklist tasks</p>
+          </div>
+        </div>
+
+        <!-- Plain English Summary -->
+        <div class="card-container" style="margin-bottom: 24px;">
+          <div class="section-header-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <h2>Executive Plain-Language Summary</h2>
+          </div>
+          <div id="plainSummaryContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 14px;">
+            <!-- Dynamically injected via analysis.js -->
+          </div>
+        </div>
+
+        <!-- Flagged Risks & Asymmetries -->
+        <div class="card-container" style="margin-bottom: 24px;">
+          <div class="section-header-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <h2>Identified Risks & Contractual Asymmetries</h2>
+          </div>
+          <div id="riskFlagsContainer" style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+            <!-- Dynamically injected via analysis.js -->
+          </div>
+        </div>
+
+        <!-- Proposed Redlines & Counter-Language -->
+        <div class="card-container" style="margin-bottom: 24px;">
+          <div class="section-header-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <h2>Proposed Counter-Language & Redlines</h2>
+          </div>
+          <div id="redlinesContainer" style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+            <!-- Dynamically injected via analysis.js -->
+          </div>
+        </div>
+
+        <!-- Annotated Document Viewer (In-line highlights) -->
+        <div class="card-container" style="margin-bottom: 24px;">
+          <div class="section-header-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <h2>Annotated Document Viewer (In-Line Highlights)</h2>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Color-coded risk markings. Hover or click highlighted clauses to inspect impact details.</p>
+          <div id="annotatedDocumentBody" tabindex="0" style="background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 20px; max-height: 480px; overflow-y: auto; font-size: 13.5px; color: #CBD5E1;" aria-label="Annotated contract text">
+            <!-- Dynamically injected via analysis.js -->
+          </div>
+        </div>
+
+        <!-- Pre-Signing Checklist & Questions for Attorney -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px;">
+          <div class="card-container">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <h2>Pre-Signing Action Checklist</h2>
+            </div>
+            <div id="checklistContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px;"></div>
+          </div>
+
+          <div class="card-container">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <h2>Attorney Consultation Questions</h2>
+            </div>
+            <div id="lawyerQuestionsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: GROUNDED Q&A ==================== -->
+      <section role="tabpanel" id="tab-chat" aria-labelledby="tab-btn-chat" class="tab-content" tabindex="0">
+        <div style="max-width: 900px; margin: 0 auto;">
+          <div class="card-container" style="margin-bottom: 24px;">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
+              <h2>Ask the Document (Document-Grounded Q&A)</h2>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+              Strictly answers questions based on verified text in your active agreement. Includes interactive citation references.
+            </p>
+
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Suggested Inquiries</div>
+              <div id="chatSuggestionChips" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+
+            <div id="chatHistoryContainer" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; min-height: 260px; max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;" aria-live="polite" aria-label="Conversation with document assistant">
+              <!-- Dynamically populated via chat.js -->
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="chatQuestionInput" placeholder="Ask a question about this contract (e.g. Can I terminate early?)..." style="flex: 1; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px 14px; color: #FFF; font-size: 14px;" onkeypress="if(event.key === 'Enter') sendChatQuestion()" aria-label="Contract question input">
+              <button class="btn btn-primary" onclick="sendChatQuestion()" aria-label="Send question">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Ask</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 5: COMPARE DOCUMENTS ==================== -->
+      <section role="tabpanel" id="tab-compare" aria-labelledby="tab-btn-compare" class="tab-content" tabindex="0">
+        <div style="max-width: 1100px; margin: 0 auto;">
+          <div class="card-container" style="margin-bottom: 24px;">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <h2>Side-by-Side Contract Comparator</h2>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+              Compare two versions or counterparty revisions to pinpoint risk shifts and modified clauses.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div>
+                <label for="compareDoc1Text" style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Document A (Baseline)</label>
+                <textarea id="compareDoc1Text" rows="6" placeholder="Paste baseline contract..." style="width: 100%; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px; color: #FFF; font-size: 13px; margin-top: 6px;"></textarea>
+              </div>
+              <div>
+                <label for="compareDoc2Text" style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Document B (Revised)</label>
+                <textarea id="compareDoc2Text" rows="6" placeholder="Paste revised contract..." style="width: 100%; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px; color: #FFF; font-size: 13px; margin-top: 6px;"></textarea>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+              <button class="btn btn-secondary btn-sm" onclick="loadSampleComparison()">Load Sample Comparison</button>
+              <button class="btn btn-primary" onclick="executeComparison()">Compare Revisions</button>
+            </div>
+          </div>
+
+          <div id="comparisonResultsWrapper" style="display: none;">
+            <div class="card-container" style="margin-bottom: 24px;">
+              <div id="compRiskShiftTitle" style="font-family: var(--font-heading); font-size: 18px; font-weight: 700; color: #FFF; margin-bottom: 6px;"></div>
+              <p id="compRiskShiftSummary" style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 16px;"></p>
+              
+              <table class="comparison-matrix-table" aria-label="Contract comparison matrix">
+                <thead>
+                  <tr style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">
+                    <th scope="col" style="text-align: left;">Category</th>
+                    <th scope="col" style="text-align: left;">Document A</th>
+                    <th scope="col" style="text-align: left;">Document B</th>
+                    <th scope="col" style="text-align: left;">Risk Shift</th>
+                  </tr>
+                </thead>
+                <tbody id="comparisonMatrixBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 6: DUE DILIGENCE HUB ==================== -->
+      <section role="tabpanel" id="tab-portfolio" aria-labelledby="tab-btn-portfolio" class="tab-content" tabindex="0">
+        <div style="max-width: 1200px; margin: 0 auto;">
+          <div class="card-container" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span class="badge badge-purple" style="margin-bottom: 4px;">Multi-Document Due Diligence</span>
+                <h2 style="font-family: var(--font-heading); font-size: 22px; color: #FFF;">Portfolio Due Diligence Hub</h2>
+                <p style="font-size: 13.5px; color: var(--text-muted);">Concurrent batch analysis for 2 to 10 contracts. Uncovers cross-document contradictions, compound liabilities, and consolidated timelines.</p>
+              </div>
+              <button class="btn btn-outline-cyan btn-sm" onclick="loadSamplePortfolio()">Load Sample Portfolio</button>
+            </div>
+
+            <div class="drop-zone" id="batchDropZone" onclick="document.getElementById('batchFileInput').click()" style="padding: 30px 20px; border: 2px dashed rgba(168, 85, 247, 0.4); border-radius: 12px; background: rgba(168, 85, 247, 0.03); text-align: center; cursor: pointer;">
+              <input type="file" id="batchFileInput" multiple accept=".pdf,.docx,.txt" style="display: none;" onchange="handleBatchFileSelect(event)" aria-label="Select multiple contract files">
+              <h3 style="color: #FFF; font-size: 15px; font-weight: 600; margin-bottom: 4px;">Drag & drop 2 to 10 contracts here (PDF, DOCX, TXT)</h3>
+              <p style="color: var(--text-muted); font-size: 12.5px;">Concurrent analysis with cross-contract risk matrix</p>
+            </div>
+
+            <div id="batchSelectedFilesList" style="margin-top: 16px; display: none;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Queued Contracts (<span id="batchFileCount">0</span>)</div>
+              <div id="batchFileItemsContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+              <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 12px;">
+                <button class="btn btn-secondary btn-sm" onclick="clearBatchQueue()">Clear</button>
+                <button class="btn btn-primary btn-sm" onclick="executeBatchAnalysis()" style="background: linear-gradient(135deg, #9333ea, #6366f1);">
+                  <span>Run Batch Due Diligence</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="batchResultsDashboard" style="display: none;">
+            <!-- Top KPIs -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
+              <div class="card-container" style="border-left: 4px solid #a855f7;">
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Portfolio Health Score</div>
+                <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 8px;">
+                  <span style="font-family: var(--font-heading); font-size: 32px; font-weight: 800; color: #FFF;" id="batchKpiScore">--</span>
+                  <span class="badge badge-warning" id="batchKpiBadge">Moderate</span>
+                </div>
+              </div>
+              <div class="card-container" style="border-left: 4px solid var(--accent-cyan);">
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Documents Audited</div>
+                <div style="font-family: var(--font-heading); font-size: 32px; font-weight: 800; color: #FFF; margin-top: 8px;" id="batchKpiDocCount">0</div>
+              </div>
+              <div class="card-container" style="border-left: 4px solid var(--risk-critical);">
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">High / Critical Flags</div>
+                <div style="font-family: var(--font-heading); font-size: 32px; font-weight: 800; color: var(--risk-critical); margin-top: 8px;" id="batchKpiHighCount">0</div>
+              </div>
+            </div>
+
+            <!-- Conflicts Card -->
+            <div class="card-container" style="margin-bottom: 24px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
+              <div class="section-header-title" style="color: #fca5a5;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <h2>Cross-Contract Contradictions & Exposures</h2>
+              </div>
+              <div id="batchConflictsContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;"></div>
+            </div>
+
+            <!-- Heatmap Table -->
+            <div class="card-container" style="margin-bottom: 24px;">
+              <div class="section-header-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                <h2>Cross-Contract Risk Heatmap Matrix</h2>
+              </div>
+              <table class="comparison-matrix-table" aria-label="Risk matrix table">
+                <thead>
+                  <tr style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">
+                    <th scope="col" style="text-align: left;">Category</th>
+                    <th scope="col" style="text-align: center;">Total Flags</th>
+                    <th scope="col" style="text-align: center;">High / Critical</th>
+                    <th scope="col" style="text-align: left;">Impacted Contracts</th>
+                  </tr>
+                </thead>
+                <tbody id="batchRiskMatrixBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Timeline -->
+            <div class="card-container" style="margin-bottom: 24px;">
+              <div class="section-header-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <h2>Unified Milestones & Renewal Deadlines</h2>
+              </div>
+              <div id="batchTimelineContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;"></div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
+              <button class="btn btn-secondary" onclick="exportBatchMarkdown()">Export Due Diligence Brief (.md)</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 7: PLAYBOOKS ==================== -->
+      <section role="tabpanel" id="tab-playbooks" aria-labelledby="tab-btn-playbooks" class="tab-content" tabindex="0">
+        <div style="max-width: 950px; margin: 0 auto;">
+          <div class="card-container" style="margin-bottom: 24px;">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <h2>Negotiation Playbooks & Custom Policy Rules</h2>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+              Define organizational fallback rules and auto-flag custom language across all contract analyses.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px;">
+              <button class="btn btn-secondary" onclick="loadPlaybookPreset('freelancer')" style="justify-content: flex-start; text-align: left; padding: 12px;">
+                <div>
+                  <div style="font-weight: 700; color: #FFF;">Freelancer Shield</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">IP ownership, net-30 terms & fee disputes</div>
+                </div>
+              </button>
+              <button class="btn btn-secondary" onclick="loadPlaybookPreset('startup')" style="justify-content: flex-start; text-align: left; padding: 12px;">
+                <div>
+                  <div style="font-weight: 700; color: #FFF;">Startup Vendor Guard</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Liability caps & uncapped indemnities</div>
+                </div>
+              </button>
+              <button class="btn btn-secondary" onclick="loadPlaybookPreset('tenant')" style="justify-content: flex-start; text-align: left; padding: 12px;">
+                <div>
+                  <div style="font-weight: 700; color: #FFF;">Tenant Rights Armor</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Deposit timelines & landlord entry notices</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Custom Rule Form -->
+            <div style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+              <h3 style="font-size: 14px; color: #FFF; margin-bottom: 12px;">Add Custom Playbook Rule</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label for="ruleTitleInput" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Rule Title</label>
+                  <input type="text" id="ruleTitleInput" placeholder="e.g. Non-Solicitation of Personnel" style="width: 100%; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px; color: #FFF; font-size: 13px; margin-top: 4px;">
+                </div>
+                <div>
+                  <label for="rulePatternInput" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Keyword / Regex Pattern</label>
+                  <input type="text" id="rulePatternInput" placeholder="e.g. non-solicit|solicit.*employees" style="width: 100%; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px; color: #FFF; font-size: 13px; margin-top: 4px;">
+                </div>
+                <div>
+                  <label for="ruleSeverityInput" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Severity</label>
+                  <select id="ruleSeverityInput" style="width: 100%; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px; color: #FFF; font-size: 13px; margin-top: 4px;">
+                    <option value="Critical">Critical</option>
+                    <option value="High" selected>High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ruleCategoryInput" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Category</label>
+                  <input type="text" id="ruleCategoryInput" placeholder="e.g. Restrictive Covenants" style="width: 100%; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px; color: #FFF; font-size: 13px; margin-top: 4px;">
+                </div>
+              </div>
+              <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                <button class="btn btn-primary btn-sm" onclick="saveCustomRule()">Add Rule to Playbook</button>
+              </div>
+            </div>
+
+            <!-- Active Rules -->
+            <div style="margin-top: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Active Rules (<span id="playbookRuleCount">0</span>)</h3>
+                <button class="btn btn-secondary btn-sm" onclick="clearPlaybookRules()">Reset to Default</button>
+              </div>
+              <div id="playbookRulesContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 8: PRIVACY & SETTINGS ==================== -->
+      <section role="tabpanel" id="tab-settings" aria-labelledby="tab-btn-settings" class="tab-content" tabindex="0">
+        <div style="max-width: 800px; margin: 0 auto;">
+          <div class="card-container" style="margin-bottom: 24px;">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <h2>Privacy, Safety & Data Architecture</h2>
+            </div>
+            <ul style="margin: 12px 0 16px 20px; font-size: 13.5px; color: #CBD5E1; line-height: 1.7;">
+              <li><strong>Zero Persistent Storage:</strong> Documents are processed in volatile memory only. No database storage exists.</li>
+              <li><strong>Informational Access:</strong> LegalLens AI delivers structured legal information to help non-lawyers prepare. We do not provide formal legal advice or create an attorney-client relationship.</li>
+              <li><strong>Instant Data Purge:</strong> Clear all local cached session state at any time.</li>
+            </ul>
+
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+              <button class="btn btn-secondary btn-sm" onclick="purgeAllSessionData()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Purge Session Data</span>
+              </button>
+              <button class="btn btn-outline-cyan btn-sm" onclick="openDisclaimerModal()">View Full Disclaimer</button>
+            </div>
+          </div>
+
+          <!-- AI Configuration -->
+          <div class="card-container">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <h2>AI Engine Configuration</h2>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">
+              LegalLens AI functions 100% out-of-the-box with our fast deterministic heuristic engine. You can optionally attach a Google Gemini API key for deep generative reasoning.
+            </p>
+
+            <div style="margin-top: 14px;">
+              <label for="geminiApiKeyInput" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Google Gemini API Key (Optional)</label>
+              <div style="display: flex; gap: 10px; margin-top: 6px;">
+                <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." style="flex: 1; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 8px 12px; color: #FFF; font-size: 13.5px;" aria-label="Google Gemini API Key">
+                <button class="btn btn-secondary btn-sm" onclick="saveApiKey()">Save</button>
+              </div>
+              <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="sessionOnlyKeyToggle" checked style="accent-color: var(--accent-cyan);">
+                <label for="sessionOnlyKeyToggle" style="font-size: 12px; color: var(--text-muted);">Session memory only (discard upon closing browser tab)</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Citation Excerpt Modal -->
+  <div class="modal-overlay" id="citationModal" role="dialog" aria-modal="true" aria-labelledby="citationModalTitle">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="citationModalTitle">Clause Citation Reference</h3>
+        <button class="modal-close-btn" onclick="closeModal('citationModal')" aria-label="Close modal">&times;</button>
+      </div>
+      <div>
+        <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-cyan); font-weight: 700;">Verified Document Excerpt</div>
+        <div class="citation-excerpt-quote" id="citationModalExcerpt"></div>
+        <p style="font-size: 13px; color: var(--text-muted);" id="citationModalSummary"></p>
+      </div>
+      <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('citationModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer Modal -->
+  <div class="modal-overlay" id="disclaimerModal" role="dialog" aria-modal="true" aria-labelledby="disclaimerModalTitle">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="disclaimerModalTitle">Legal Information & Safety Notice</h3>
+        <button class="modal-close-btn" onclick="closeModal('disclaimerModal')" aria-label="Close modal">&times;</button>
+      </div>
+      <div style="font-size: 13.5px; color: #CBD5E1; line-height: 1.6;">
+        <p style="margin-bottom: 12px;"><strong>LegalLens AI provides general legal information and is not a law firm, lawyer, or substitute for professional legal counsel.</strong></p>
+        <p style="margin-bottom: 12px;">Legal agreements create binding enforceable obligations governed by jurisdiction-specific statutes and court precedents. While LegalLens AI provides structured analysis and redline templates, it does not guarantee legal enforceability or provide attorney representation.</p>
+        <p>Always consult with a licensed attorney in your jurisdiction prior to signing legally binding contracts or waiving statutory rights.</p>
+      </div>
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary btn-sm" onclick="closeModal('disclaimerModal')">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-side JavaScript Modules -->
+  <script src="js/samples.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/portfolio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

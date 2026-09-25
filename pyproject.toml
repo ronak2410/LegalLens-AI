@@ -1,0 +1,17 @@
+[project]
+name = "legallens-ai"
+version = "1.0.0"
+description = "LegalLens AI - Enterprise AI for Legal Assistance & Access"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.6",
+    "python-docx>=0.8.11",
+    "google-generativeai>=0.3.0",
+]
+
+[tool.vercel]
+entrypoint = "backend.app:app"

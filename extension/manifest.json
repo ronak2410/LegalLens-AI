@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "LegalLens AI - Instant Web Contract & T&C Scanner",
+  "version": "1.0.0",
+  "description": "Instantly analyze and demystify Terms of Service, Privacy Policies, and online agreements before clicking 'I Agree'.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "contextMenus"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
