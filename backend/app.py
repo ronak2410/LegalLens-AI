@@ -457,11 +457,14 @@ if STATIC_DIR.exists():
             return FileResponse(str(target), media_type=media_type)
         raise HTTPException(status_code=404, detail="Static asset not found")
 
-    @app.get("/{catchall:path}")
-    async def serve_frontend(catchall: str):
+    @app.api_route("/{catchall:path}", methods=["GET", "POST", "OPTIONS"])
+    async def serve_frontend(request: Request, catchall: str):
         # Do NOT serve index.html for API paths
-        if catchall.startswith("api/") or catchall == "api":
+        if catchall.startswith("api/") or catchall == "api" or catchall.startswith("analyze") or catchall.startswith("chat") or catchall.startswith("compare") or catchall.startswith("upload") or catchall.startswith("export"):
             raise HTTPException(status_code=404, detail="API route not found")
+
+        if request.method != "GET":
+            raise HTTPException(status_code=405, detail="Method Not Allowed")
 
         try:
             cleaned = catchall.replace("static/", "", 1) if catchall.startswith("static/") else catchall

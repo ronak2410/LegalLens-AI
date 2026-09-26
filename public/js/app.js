@@ -215,7 +215,17 @@ async function handleSingleFileSelect(event) {
       body: formData
     });
 
-    if (!res.ok) throw new Error("File upload failed: " + (await res.text()));
+    if (!res.ok) {
+      let errDetail = "File upload failed";
+      try {
+        const errJson = await res.json();
+        errDetail = errJson.detail || errJson.message || JSON.stringify(errJson);
+      } catch (_) {
+        const txt = await res.text();
+        errDetail = txt || `HTTP Error ${res.status}`;
+      }
+      throw new Error(errDetail);
+    }
     const data = await res.json();
 
     setActiveDocument(data.extracted_text, file.name);

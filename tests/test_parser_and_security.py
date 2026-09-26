@@ -39,3 +39,32 @@ def test_security_headers_enforced():
     assert res.headers["X-Content-Type-Options"] == "nosniff"
     assert res.headers["X-Frame-Options"] == "DENY"
     assert "Content-Security-Policy" in res.headers
+
+def test_file_upload_api_endpoint():
+    file_content = b"This Independent Contractor Agreement specifies that Contractor assigns all background IP. Payment is Net-90. Either party may terminate with 30 days notice."
+    res = client.post(
+        "/api/analyze-upload",
+        files={"file": ("contract.txt", file_content, "text/plain")}
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "risk_assessment" in data
+    assert "risks_and_flags" in data
+    assert "extracted_text" in data
+
+def test_vercel_asgi_path_normalization():
+    from api.index import app as vercel_app
+    vercel_client = TestClient(vercel_app)
+    
+    file_content = b"This Master Services Agreement is entered into on Jan 1, 2024. Either party may terminate upon 30 days notice. Payment Net-30."
+    res = vercel_client.post(
+        "/api/index.py",
+        headers={"x-matched-path": "/api/analyze-upload"},
+        files={"file": ("contract.txt", file_content, "text/plain")}
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "risk_assessment" in data
+    assert "extracted_text" in data
+
+
