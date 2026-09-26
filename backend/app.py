@@ -100,6 +100,59 @@ async def enforce_payload_size_and_security_headers(request: Request, call_next)
     )
     return response
 
+import urllib.parse
+from starlette.types import ASGIApp, Scope, Receive, Send
+
+class VercelPathNormalizerMiddleware:
+    """
+    ASGI middleware that normalizes incoming requests when deployed on Vercel Serverless.
+    Translates /api/index.py or query subpaths into proper FastAPI API paths before routing.
+    """
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] == "http":
+            target_path = None
+            query_bytes = scope.get("query_string", b"")
+            if query_bytes:
+                qs_str = query_bytes.decode("utf-8", errors="ignore")
+                parsed_qs = urllib.parse.parse_qs(qs_str)
+                if "__vercel_subpath__" in parsed_qs:
+                    sub = parsed_qs["__vercel_subpath__"][0]
+                    target_path = "/api/" + sub.lstrip("/") if sub else "/api"
+                    cleaned_pairs = [(k, v) for k, vals in parsed_qs.items() if k != "__vercel_subpath__" for v in vals]
+                    scope["query_string"] = urllib.parse.urlencode(cleaned_pairs).encode("utf-8")
+
+            if not target_path:
+                headers = dict(scope.get("headers", []))
+                matched = (
+                    headers.get(b"x-matched-path")
+                    or headers.get(b"x-vercel-matched-path")
+                    or headers.get(b"x-forwarded-uri")
+                )
+                if matched:
+                    decoded = matched.decode("utf-8", errors="ignore").split("?")[0]
+                    if decoded.startswith("/api"):
+                        target_path = decoded
+
+            curr_path = scope.get("path", "")
+            if target_path:
+                scope["path"] = target_path
+                if "raw_path" in scope:
+                    scope["raw_path"] = target_path.encode("utf-8")
+            elif curr_path.startswith("/api/index.py"):
+                sub = curr_path[len("/api/index.py"):]
+                norm = "/api" + (sub if sub.startswith("/") else ("/" + sub if sub else ""))
+                scope["path"] = norm
+                if "raw_path" in scope:
+                    scope["raw_path"] = norm.encode("utf-8")
+
+        await self.app(scope, receive, send)
+
+# Add Vercel ASGI path normalizer
+app.add_middleware(VercelPathNormalizerMiddleware)
+
 # High-efficiency GZip compression middleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
@@ -461,8 +514,7 @@ if STATIC_DIR.exists():
     async def serve_frontend(request: Request, catchall: str):
         # Do NOT serve index.html for API paths
         if catchall.startswith("api/") or catchall == "api" or catchall.startswith("analyze") or catchall.startswith("chat") or catchall.startswith("compare") or catchall.startswith("upload") or catchall.startswith("export"):
-            scope_path = request.scope.get("path", "")
-            raise HTTPException(status_code=404, detail=f"API route not found. catchall={catchall}, url_path={request.url.path}, scope_path={scope_path}, query={request.url.query}")
+            raise HTTPException(status_code=404, detail="API route not found")
 
 
         if request.method != "GET":
