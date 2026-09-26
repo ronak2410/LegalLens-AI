@@ -57,14 +57,26 @@ def test_vercel_asgi_path_normalization():
     vercel_client = TestClient(vercel_app)
     
     file_content = b"This Master Services Agreement is entered into on Jan 1, 2024. Either party may terminate upon 30 days notice. Payment Net-30."
-    res = vercel_client.post(
+    
+    # 1. Test with query string rewrite param
+    res1 = vercel_client.post(
+        "/api/index.py?__vercel_subpath__=analyze-upload",
+        files={"file": ("contract.txt", file_content, "text/plain")}
+    )
+    assert res1.status_code == 200
+    data1 = res1.json()
+    assert "risk_assessment" in data1
+    assert "extracted_text" in data1
+
+    # 2. Test with Vercel header
+    res2 = vercel_client.post(
         "/api/index.py",
         headers={"x-matched-path": "/api/analyze-upload"},
         files={"file": ("contract.txt", file_content, "text/plain")}
     )
-    assert res.status_code == 200
-    data = res.json()
-    assert "risk_assessment" in data
-    assert "extracted_text" in data
+    assert res2.status_code == 200
+    data2 = res2.json()
+    assert "risk_assessment" in data2
+
 
 
