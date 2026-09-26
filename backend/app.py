@@ -461,7 +461,9 @@ if STATIC_DIR.exists():
     async def serve_frontend(request: Request, catchall: str):
         # Do NOT serve index.html for API paths
         if catchall.startswith("api/") or catchall == "api" or catchall.startswith("analyze") or catchall.startswith("chat") or catchall.startswith("compare") or catchall.startswith("upload") or catchall.startswith("export"):
-            raise HTTPException(status_code=404, detail="API route not found")
+            scope_path = request.scope.get("path", "")
+            raise HTTPException(status_code=404, detail=f"API route not found. catchall={catchall}, url_path={request.url.path}, scope_path={scope_path}, query={request.url.query}")
+
 
         if request.method != "GET":
             raise HTTPException(status_code=405, detail="Method Not Allowed")
